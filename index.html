@@ -1092,6 +1092,32 @@
       align-items: end;
     }
 
+    .app-footer {
+      max-width: 1900px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .app-footer a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color var(--transition), border-color var(--transition);
+    }
+
+    .app-footer a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
     /* Tool-help */
     .syntax-ref {
       background: var(--bg-main);
@@ -1231,7 +1257,10 @@
     <div class="card">
       <div class="card-header">
         <span class="card-title">Graph Expressions</span>
-        <button class="btn-add-expr" id="add-expr-btn" style="width:auto;padding:.35rem .85rem;margin:0;font-size:.72rem;">+ Add</button>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button type="button" class="btn-add-expr small" id="add-expr-btn">+ Add</button>
+          <button type="button" class="btn-header" id="clear-expr-btn">Clear All</button>
+        </div>
       </div>
       <div class="card-body">
         <div class="expr-list" id="expr-list"></div>
@@ -1355,7 +1384,7 @@
   <div class="card">
     <div class="card-header">
       <span class="card-title">Session History</span>
-      <button id="clear-hist-btn" style="background:none;border:none;color:var(--text-faint);font-size:.7rem;font-family:var(--font-mono);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;">Clear</button>
+      <button type="button" id="clear-hist-btn" class="btn-header">Clear</button>
     </div>
     <div class="card-body" style="padding-top:.75rem;">
       <div class="history-list" id="hist-list">
@@ -1387,6 +1416,12 @@
   </div>
 
 </div>
+
+<footer class="app-footer">
+  <a href="privacy-policy.html">Privacy Policy</a>
+  <a href="terms-of-service.html">Terms of Service</a>
+  <span>Data stored locally in your browser only.</span>
+</footer>
 
 <!-- Values -->
 <div class="modal-overlay" id="table-modal">
@@ -1517,11 +1552,11 @@ class MathEngine {
     };
 
     const parsePower = () => {
-      let base = parseAtom();
-      while (peek() === "^") {
+      const base = parseAtom();
+      if (peek() === "^") {
         pos++;
-        const exp = parseAtom();
-        base = Math.pow(base, exp);
+        const exp = parsePower();
+        return Math.pow(base, exp);
       }
       return base;
     };
@@ -2181,6 +2216,72 @@ const canvasEl   = document.getElementById("studio-canvas");
 const holder     = document.getElementById("canvas-holder");
 const renderer   = new GraphRenderer(canvasEl, mathEngine);
 
+const STORAGE_KEY = "analytical-studio-state";
+
+function createSavedExpression(raw, color, id) {
+  const expr = { id: id || Math.random().toString(36).slice(2, 9), raw: raw || "", color: color || PALETTE[expressions.length % PALETTE.length], fn: null, error: "" };
+  if (expr.raw) compileExpression(expr);
+  return expr;
+}
+
+function loadAppState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    if (state.theme) document.body.setAttribute("data-theme", state.theme);
+    if (state.a11y) {
+      document.body.classList.add("a11y-on");
+      document.getElementById("a11y-pill").textContent = "ON";
+    }
+    if (state.angleMode) mathEngine.angleMode = state.angleMode;
+    if (state.expressions && Array.isArray(state.expressions)) {
+      expressions = state.expressions.map((item, idx) => createSavedExpression(item.raw, item.color, item.id));
+    }
+    if (state.sessionHistory && Array.isArray(state.sessionHistory)) sessionHistory = state.sessionHistory;
+    if (typeof state.lastAnswer === "number") lastAnswer = state.lastAnswer;
+    if (typeof state.calcExpr === "string") calcExpr = state.calcExpr;
+    if (state.activeTab) activeTab = state.activeTab;
+    if (state.viewport) {
+      const { xmin, xmax, ymin, ymax } = state.viewport;
+      if ([xmin, xmax, ymin, ymax].every(v => typeof v === "number")) {
+        document.getElementById("xmin").value = xmin;
+        document.getElementById("xmax").value = xmax;
+        document.getElementById("ymin").value = ymin;
+        document.getElementById("ymax").value = ymax;
+        renderer.applyRange(xmin, xmax, ymin, ymax);
+      }
+    }
+  } catch (error) {
+    console.warn("Failed to restore saved state:", error);
+  }
+}
+
+function saveAppState() {
+  try {
+    const state = {
+      theme: document.body.getAttribute("data-theme"),
+      a11y: document.body.classList.contains("a11y-on"),
+      angleMode: mathEngine.angleMode,
+      expressions: expressions.map(({ id, raw, color }) => ({ id, raw, color })),
+      sessionHistory,
+      lastAnswer,
+      calcExpr,
+      activeTab,
+      viewport: {
+        xmin: parseFloat(document.getElementById("xmin").value),
+        xmax: parseFloat(document.getElementById("xmax").value),
+        ymin: parseFloat(document.getElementById("ymin").value),
+        ymax: parseFloat(document.getElementById("ymax").value)
+      },
+      memory: { value: mathEngine.memory, hasMemory: mathEngine.hasMemory }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn("Failed to save state:", error);
+  }
+}
+
 const PALETTE = [
   "#d4a373","#34d399","#f87171","#c084fc",
   "#fbbf24","#22d3ee","#ff9f7f","#a78bfa",
@@ -2238,6 +2339,7 @@ function buildThemeStrip() {
       btn.classList.add("active");
       document.body.setAttribute("data-theme", t.key);
       renderer.draw(expressions);
+      saveAppState();
     };
     strip.appendChild(btn);
   });
@@ -2247,6 +2349,7 @@ document.getElementById("a11y-toggle").onclick = () => {
   const on = document.body.classList.toggle("a11y-on");
   document.getElementById("a11y-pill").textContent = on ? "ON" : "OFF";
   renderer.draw(expressions);
+  saveAppState();
 };
 
 function initCanvas() {
@@ -2339,6 +2442,7 @@ document.getElementById("zoom-out-btn").onclick = () => { renderer.zoom(1/1.3); 
 document.getElementById("reset-view-btn").onclick = () => {
   renderer.resetView();
   renderer.draw(expressions);
+  saveAppState();
 };
 
 document.getElementById("apply-range-btn").onclick = () => {
@@ -2350,6 +2454,7 @@ document.getElementById("apply-range-btn").onclick = () => {
   if (xMin >= xMax || yMin >= yMax) return;
   renderer.applyRange(xMin, xMax, yMin, yMax);
   renderer.draw(expressions);
+  saveAppState();
 };
 
 document.getElementById("screenshot-btn").onclick = () => {
@@ -2410,6 +2515,7 @@ function renderExpressionList() {
       err.textContent = item.raw ? item.error : "";
       updateInfo(item, infoDiv);
       renderer.draw(expressions);
+      saveAppState();
     });
 
     input.addEventListener("keydown", e => {
@@ -2446,6 +2552,7 @@ function renderExpressionList() {
       expressions = expressions.filter(i => i.id !== item.id);
       renderExpressionList();
       renderer.draw(expressions);
+      saveAppState();
     };
 
     row.appendChild(swatch);
@@ -2475,6 +2582,7 @@ function addExpression(raw = "") {
   expressions.push(item);
   renderExpressionList();
   renderer.draw(expressions);
+  saveAppState();
   // Auto-focus
   setTimeout(() => {
     const inputs = document.querySelectorAll(".expr-input");
@@ -2483,6 +2591,12 @@ function addExpression(raw = "") {
 }
 
 document.getElementById("add-expr-btn").onclick = () => addExpression();
+document.getElementById("clear-expr-btn").onclick = () => {
+  expressions = [];
+  renderExpressionList();
+  renderer.draw(expressions);
+  saveAppState();
+};
 
 function buildPresets() {
   const grid = document.getElementById("presets-grid");
@@ -2546,18 +2660,19 @@ function buildMemRow() {
   const row = document.getElementById("mem-row");
   row.innerHTML = "";
   const ops = [
-    { l:"MC", fn: () => { mathEngine.memClear(); updateMemUI(); }},
+    { l:"MC", fn: () => { mathEngine.memClear(); updateMemUI(); saveAppState(); }},
     { l:"MR", fn: () => {
       calcExpr += mathEngine.memRecall().toString();
       updateCalcDisplay();
+      saveAppState();
     }},
     { l:"M+", fn: () => {
       const v = mathEngine.evaluate(calcExpr);
-      if (v !== null) { mathEngine.memAdd(v); updateMemUI(); }
+      if (v !== null) { mathEngine.memAdd(v); updateMemUI(); saveAppState(); }
     }},
     { l:"MS", fn: () => {
       const v = mathEngine.evaluate(calcExpr);
-      if (v !== null) { mathEngine.memStore(v); updateMemUI(); }
+      if (v !== null) { mathEngine.memStore(v); updateMemUI(); saveAppState(); }
     }}
   ];
   ops.forEach(op => {
@@ -2614,6 +2729,7 @@ function handleCalcKey(v) {
       calcExpr += v;
       updateCalcDisplay();
   }
+  saveAppState();
 }
 
 function updateCalcDisplay(forceResult) {
@@ -2656,6 +2772,7 @@ document.querySelectorAll(".angle-pill").forEach(p => {
     p.classList.add("active");
     mathEngine.angleMode = p.dataset.mode;
     renderer.draw(expressions);
+    saveAppState();
   };
 });
 
@@ -2682,6 +2799,7 @@ function appendHistory(expr, result) {
   sessionHistory.unshift({ expr, result });
   if (sessionHistory.length > 80) sessionHistory.pop();
   renderHistory();
+  saveAppState();
 }
 
 function renderHistory() {
@@ -2709,6 +2827,7 @@ function renderHistory() {
 document.getElementById("clear-hist-btn").onclick = () => {
   sessionHistory = [];
   renderHistory();
+  saveAppState();
 };
 
 document.getElementById("stats-calc-btn").onclick = () => {
@@ -2790,6 +2909,7 @@ document.getElementById("gen-table-btn").onclick = () => {
   wrap.innerHTML = `<table><thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table>`;
 };
 
+loadAppState();
 buildThemeStrip();
 buildPresets();
 buildBibliography();
@@ -2797,14 +2917,27 @@ buildCalcPad("calc-pad-basic", BASIC_KEYS);
 buildCalcPad("calc-pad-sci",   SCI_KEYS);
 buildCalcPad("calc-pad-const", CONST_KEYS);
 buildMemRow();
+
+if (activeTab !== "basic") {
+  document.querySelectorAll(".calc-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === activeTab));
+  document.getElementById("calc-pad-basic").style.display  = activeTab === "basic" ? "grid" : "none";
+  document.getElementById("calc-pad-sci").style.display    = activeTab === "sci" ? "grid" : "none";
+  document.getElementById("calc-pad-const").style.display  = activeTab === "const" ? "grid" : "none";
+}
+
 renderExpressionList();
 renderHistory();
+updateCalcDisplay();
 
 setTimeout(() => {
   initCanvas();
 }, 0);
 
-addExpression("f(x) = sin(x)");
+if (expressions.length === 0) {
+  addExpression("f(x) = sin(x)");
+} else {
+  saveAppState();
+}
 </script>
 </body>
 </html>
