@@ -16,3 +16,7 @@
 * **High contrast:** Easier to read.
 * **Quick examples:** Instant math presets.
 * **History log:** Re-use past equations.
+
+### 📄 Legal
+* `privacy-policy.html` — explains what data is stored locally and confirms no third-party analytics.
+* `terms-of-service.html` — usage terms, disclaimer, and liability information.
