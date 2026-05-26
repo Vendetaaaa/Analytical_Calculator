@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytical Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+  /* Base-line theme */
+    /* Brown = Dark-beige ( Allegedly )*/
+    :root {
+      --bg-main:           #111010;
+      --bg-panel:          #1a1818;
+      --bg-input:          #252222;
+      --bg-active:         #2f2b2b;
+      --bg-hover:          #332f2f;
+      --border:            #3a3535;
+      --border-soft:       #2a2626;
+      --text:              #f2ece6;
+      --text-muted:        #9e9390;
+      --text-faint:        #5c5856;
+      --accent:            #e8b98a;
+      --accent-glow:       rgba(232,185,138,.18);
+      --accent-dim:        #b08a60;
+      --danger:            #e07070;
+      --success:           #72d9a4;
+      --canvas-bg:         #0d0c0c;
+      --axis-color:        rgba(242,236,230,.3);
+      --grid-color:        rgba(242,236,230,.04);
+      --scroll-track:      #1a1818;
+      --scroll-thumb:      #3a3535;
+      --scroll-thumb-hov:  #4a4545;
+      --font-mono:         'JetBrains Mono', monospace;
+      --font-ui:           'Syne', sans-serif;
+      --radius-sm:         6px;
+      --radius-md:         10px;
+      --radius-lg:         14px;
+      --transition:        0.15s ease;
+    }
+
+  /* Themes (selection) */
+    /* Void = Black */
+    [data-theme="void"] {
+      --bg-main:           #080808;
+      --bg-panel:          #111111;
+      --bg-input:          #1c1c1c;
+      --bg-active:         #272727;
+      --bg-hover:          #2e2e2e;
+      --border:            #303030;
+      --border-soft:       #1e1e1e;
+      --text:              #f8f6f2;
+      --text-muted:        #888;
+      --text-faint:        #444;
+      --accent:            #ffffff;
+      --accent-glow:       rgba(255,255,255,.08);
+      --accent-dim:        #aaaaaa;
+      --canvas-bg:         #050505;
+      --axis-color:        rgba(255,255,255,.28);
+      --grid-color:        rgba(255,255,255,.035);
+      --scroll-track:      #111;
+      --scroll-thumb:      #2a2a2a;
+      --scroll-thumb-hov:  #3a3a3a;
+    }
+
+    /* Gray */
+    [data-theme="matte"] {
+      --bg-main:           #181818;
+      --bg-panel:          #222222;
+      --bg-input:          #2b2b2b;
+      --bg-active:         #363636;
+      --bg-hover:          #3c3c3c;
+      --border:            #404040;
+      --border-soft:       #2c2c2c;
+      --text:              #e8e8e8;
+      --text-muted:        #909090;
+      --text-faint:        #555;
+      --accent:            #e0e0e0;
+      --accent-glow:       rgba(224,224,224,.08);
+      --accent-dim:        #a0a0a0;
+      --canvas-bg:         #111;
+      --axis-color:        rgba(255,255,255,.22);
+      --grid-color:        rgba(255,255,255,.04);
+      --scroll-track:      #222;
+      --scroll-thumb:      #363636;
+      --scroll-thumb-hov:  #484848;
+    }
+
+    /* Light brown = Light-Beige ( Allegedly )*/
+    [data-theme="light-brown"] {
+      --bg-main:           #f4f0e8;
+      --bg-panel:          #e9e3d6;
+      --bg-input:          #ddd6c6;
+      --bg-active:         #cec6b4;
+      --bg-hover:          #c5bca8;
+      --border:            #b8af9c;
+      --border-soft:       #d0c9b8;
+      --text:              #2e2922;
+      --text-muted:        #6e6458;
+      --text-faint:        #a89e90;
+      --accent:            #2e2922;
+      --accent-glow:       rgba(46,41,34,.1);
+      --accent-dim:        #6e6458;
+      --danger:            #c0504a;
+      --success:           #4a8c68;
+      --canvas-bg:         #ede6d8;
+      --axis-color:        rgba(46,41,34,.28);
+      --grid-color:        rgba(46,41,34,.05);
+      --scroll-track:      #e9e3d6;
+      --scroll-thumb:      #b8af9c;
+      --scroll-thumb-hov:  #a8a090;
+    }
+
+    /* Deep-blue */
+    [data-theme="ocean"] {
+      --bg-main:           #010d1e;
+      --bg-panel:          #07182e;
+      --bg-input:          #0e2440;
+      --bg-active:         #183352;
+      --bg-hover:          #1e3d5e;
+      --border:            #2a4f72;
+      --border-soft:       #102030;
+      --text:              #e8f4ff;
+      --text-muted:        #7aaac8;
+      --text-faint:        #3a607a;
+      --accent:            #38c8f8;
+      --accent-glow:       rgba(56,200,248,.18);
+      --accent-dim:        #1a90c0;
+      --canvas-bg:         #010810;
+      --axis-color:        rgba(56,200,248,.38);
+      --grid-color:        rgba(56,200,248,.06);
+      --scroll-track:      #07182e;
+      --scroll-thumb:      #183352;
+      --scroll-thumb-hov:  #2a4f72;
+    }
+
+    /* Marine = light-blue */
+    [data-theme="marine"] {
+      --bg-main:           #031414;
+      --bg-panel:          #072626;
+      --bg-input:          #0e3838;
+      --bg-active:         #154c4c;
+      --bg-hover:          #1c5c5c;
+      --border:            #227070;
+      --border-soft:       #0a2c2c;
+      --text:              #d8f4f0;
+      --text-muted:        #66b0a8;
+      --text-faint:        #2e6060;
+      --accent:            #00f0c0;
+      --accent-glow:       rgba(0,240,192,.15);
+      --accent-dim:        #00a888;
+      --canvas-bg:         #020e0e;
+      --axis-color:        rgba(0,240,192,.35);
+      --grid-color:        rgba(0,240,192,.05);
+      --scroll-track:      #072626;
+      --scroll-thumb:      #154c4c;
+      --scroll-thumb-hov:  #227070;
+    }
+
+    /* High contrast */
+    body.a11y-on {
+      --bg-main:          #000000 !important;
+      --bg-panel:         #000000 !important;
+      --bg-input:         #0d0d0d !important;
+      --bg-active:        #ffffff !important;
+      --bg-hover:         #dddddd !important;
+      --border:           #ffffff !important;
+      --border-soft:      #888888 !important;
+      --text:             #ffffff !important;
+      --text-muted:       #ffff00 !important;
+      --text-faint:       #aaaaaa !important;
+      --accent:           #ffff00 !important;
+      --accent-glow:      rgba(255,255,0,.2) !important;
+      --accent-dim:       #cccc00 !important;
+      --canvas-bg:        #000000 !important;
+      --axis-color:       #ffff00 !important;
+      --grid-color:       rgba(255,255,255,.15) !important;
+    }
+
+    /* Base and reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+      scrollbar-width: thin;
+      scroll-behavior: smooth;
+    }
+
+    /* Defaults of browser*/
+    ::-webkit-scrollbar               { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track         { background: var(--scroll-track); }
+    ::-webkit-scrollbar-thumb         { background: var(--scroll-thumb); border-radius: 5px; border: 2px solid var(--scroll-track); }
+    ::-webkit-scrollbar-thumb:hover   { background: var(--scroll-thumb-hov); }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text);
+      font-family: var(--font-ui);
+      overflow-x: hidden;
+      overflow-y: scroll;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: var(--bg-panel);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--bg-main);
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+
+    .app-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .app-subtitle {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-top: 3px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Theme selector */
+    .theme-strip {
+      display: flex;
+      gap: 0.3rem;
+      background: var(--bg-input);
+      padding: 0.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      align-items: center;
+    }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.35rem 0.7rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover {
+      color: var(--text);
+      background: var(--bg-hover);
+    }
+
+    .theme-btn.active {
+      background: var(--bg-active);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    /* GitHub badge */
+    .github-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      background: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-md);
+      transition: background var(--transition);
+    }
+
+    .github-link:hover { background: var(--bg-active); }
+
+    .github-link svg {
+      fill: var(--text);
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .github-name {
+      color: #e07070;
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+
+    /* Accessibility */
+    .a11y-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.72rem;
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .a11y-btn:hover { background: var(--bg-active); }
+
+    .a11y-pill {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: var(--bg-active);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    body.a11y-on .a11y-pill {
+      background: #ffff00;
+      color: #000;
+      font-weight: 900;
+    }
+
+    /* Layout */
+    .workspace {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      max-width: 1900px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    /* LP */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    /* Buttons */
+    .btn-add-expr {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--accent-glow);
+      border: 1.5px dashed var(--accent-dim);
+      color: var(--accent);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition);
+      margin-bottom: 1rem;
+    }
+
+    .btn-add-expr:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      border-style: solid;
+    }
+
+    /* Rows */
+    .expr-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .expr-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.75rem 0.75rem 0.9rem;
+      transition: border-color var(--transition);
+    }
+
+    .expr-row:focus-within {
+      border-color: var(--border);
+    }
+
+    .color-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .expr-inner {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .expr-label {
+      font-size: 0.6rem;
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+
+    .expr-input {
+      background: none;
+      border: none;
+      outline: none;
+      width: 100%;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+
+    .expr-input::placeholder {
+      color: var(--text-faint);
+    }
+
+    .expr-error {
+      font-size: 0.7rem;
+      color: var(--danger);
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .expr-info {
+      font-size: 0.68rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      margin-top: 3px;
+    }
+
+    .btn-remove-expr {
+      background: none;
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 2px 4px;
+      transition: color var(--transition);
+      margin-top: 1px;
+    }
+
+    .btn-remove-expr:hover { color: var(--danger); }
+
+    /* Viewports */
+    .viewport-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ctrl-label {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .ctrl-input {
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.45rem 0.65rem;
+      width: 100%;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .ctrl-input:focus { border-color: var(--border); }
+    .ctrl-input[type="range"] { padding: 0.35rem 0; cursor: pointer; }
+
+    .btn-reset-view {
+      grid-column: 1 / -1;
+      padding: 0.6rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .btn-reset-view:hover { background: var(--bg-hover); color: var(--text); }
+
+    /* Presets */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .preset-btn {
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.35;
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+
+    .preset-btn:hover {
+      background: var(--bg-input);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .preset-expr {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--accent-dim);
+      margin-top: 2px;
+    }
+
+    /* RP */
+    .view-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .canvas-card {
+      background: var(--canvas-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      height: 500px;
+    }
+
+    #studio-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    #studio-canvas:active { cursor: grabbing; }
+
+    /* RP overlay */
+    .canvas-info-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 100%);
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .canvas-coord {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,.55);
+    }
+
+    /* RP help */
+    .canvas-toolbar {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .canvas-tool-btn {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .canvas-tool-btn:hover { background: var(--bg-active); color: var(--text); }
+
+    /* Calc */
+    .calc-card {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .calc-screen {
+      background: var(--canvas-bg);
+      padding: 1rem 1.25rem;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .calc-expr-display {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      overflow-x: auto;
+      white-space: nowrap;
+      min-height: 1.2em;
+    }
+
+    .calc-result-display {
+      font-family: var(--font-mono);
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .calc-result-display.error-state {
+      color: var(--danger);
+      font-size: 1.4rem;
+    }
+
+    .calc-tabs {
+      display: flex;
+      padding: 0.75rem 1rem 0;
+      gap: 0.4rem;
+    }
+
+    .calc-tab {
+      background: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      border-bottom: none;
+      color: var(--text-muted);
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .calc-tab:hover { color: var(--text); }
+
+    .calc-tab.active {
+      background: var(--bg-active);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .calc-grid-wrap {
+      padding: 0.75rem;
+    }
+
+    .calc-grid {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .calc-grid.basic-grid  { grid-template-columns: repeat(5, 1fr); }
+    .calc-grid.sci-grid    { grid-template-columns: repeat(5, 1fr); }
+    .calc-grid.const-grid  { grid-template-columns: repeat(4, 1fr); }
+
+    .kbtn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 0.9rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), transform 0.08s;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .kbtn:hover { background: var(--bg-active); border-color: var(--border); }
+    .kbtn:active { transform: scale(0.96); }
+
+    .kbtn.accent {
+      background: var(--accent-glow);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .kbtn.accent:hover {
+      background: rgba(232,185,138,.28);
+      border-color: var(--accent);
+    }
+
+    .kbtn.danger {
+      background: rgba(224,112,112,.1);
+      border-color: rgba(224,112,112,.3);
+      color: var(--danger);
+    }
+
+    .kbtn.danger:hover {
+      background: rgba(224,112,112,.2);
+      border-color: var(--danger);
+    }
+
+    .kbtn.wide  { grid-column: span 2; }
+
+    /* Memory */
+    .mem-row {
+      display: flex;
+      gap: 0.45rem;
+      margin-top: 0.45rem;
+    }
+
+    .mem-btn {
+      flex: 1;
+      padding: 0.55rem 0.25rem;
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      color: var(--text-faint);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color var(--transition), background var(--transition);
+    }
+
+    .mem-btn:hover { color: var(--text-muted); background: var(--bg-input); }
+    .mem-btn.has-mem { color: var(--accent-dim); }
+
+    /* Sub */
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      padding: 0 1.5rem;
+      max-width: 1900px;
+      margin: 0 auto;
+      margin-top: 0;
+    }
+
+    /* History */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .hist-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 1rem;
+      cursor: pointer;
+      gap: 0.75rem;
+      transition: border-color var(--transition);
+    }
+
+    .hist-entry:hover { border-color: var(--border); }
+
+    .hist-expr {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .hist-result {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .hist-empty {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-faint);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .stat-box {
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.9rem;
+    }
+
+    .stat-name {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 4px;
+    }
+
+    .stat-val {
+      font-size: 1.1rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .stats-textarea {
+      width: 100%;
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 0.65rem;
+      resize: vertical;
+      min-height: 70px;
+      outline: none;
+    }
+
+    .stats-textarea:focus { border-color: var(--border); }
+
+    .btn-stats-calc {
+      width: 100%;
+      padding: 0.65rem;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent-dim);
+      color: var(--accent);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .btn-stats-calc:hover { background: rgba(232,185,138,.28); }
+
+    /* Bibl */
+    .bib-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .bib-item {
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+
+    .bib-link {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--accent);
+      text-decoration: none;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .bib-link:hover { text-decoration: underline; }
+
+    .bib-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* I forgot */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-width: 560px;
+      width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .table-wrap {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    thead th {
+      background: var(--bg-input);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    tbody tr:hover { background: var(--bg-main); }
+
+    tbody td {
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+    }
+
+    tbody td:first-child { color: var(--text-muted); }
+
+    .table-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 0.5rem;
+      align-items: end;
+    }
+
+    /* Tool-help */
+    .syntax-ref {
+      background: var(--bg-main);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+
+    .syntax-ref-title {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    .syntax-rows {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem 1rem;
+    }
+
+    .syntax-row {
+      display: flex;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .syn-key  { color: var(--accent-dim); font-weight: 600; }
+    .syn-desc { color: var(--text-faint); }
+
+    /* Screens */
+    @media (max-width: 1200px) {
+      .workspace { grid-template-columns: 360px 1fr; }
+      .lower-grid { grid-template-columns: 1fr 1fr; }
+      .lower-grid > :last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; padding: 1rem; }
+      .lower-grid { grid-template-columns: 1fr; padding: 0 1rem; }
+      .lower-grid > * { grid-column: auto; }
+      .canvas-card { height: 360px; }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 0.75rem 1rem; }
+      .theme-strip { flex-wrap: wrap; }
+      .calc-grid.basic-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .expr-row { animation: fadeIn 0.18s ease; }
+
+    .kbtn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kbtn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.06);
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+
+    .kbtn:hover::after { opacity: 1; }
+
+    .angle-indicator {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .angle-pill {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-soft);
+      color: var(--text-faint);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .angle-pill.active {
+      background: var(--accent-glow);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body data-theme="brown">
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark">∫</div>
+    <div>
+      <div class="app-title">Mathematical Studio</div>
+      <div class="app-subtitle">Calculator &amp; Graph Canva</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="theme-strip" id="theme-strip"></div>
+
+    <a href="https://github.com/Vendetaaaa" target="_blank" rel="noopener" class="github-link">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.562 21.8 24 17.302 24 12 24 5.373 18.627 0 12 0z"/></svg>
+      <span class="github-name">Vendetaaaa</span>
+    </a>
+
+    <button class="a11y-btn" id="a11y-toggle">
+      <span>High Contrast</span>
+      <span class="a11y-pill" id="a11y-pill">OFF</span>
+    </button>
+  </div>
+</header>
+
+<!-- Workspace -->
+<div class="workspace">
+
+  <!-- Left -->
+  <div class="side-panel">
+
+    <!-- Graph -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Graph Expressions</span>
+        <button class="btn-add-expr" id="add-expr-btn" style="width:auto;padding:.35rem .85rem;margin:0;font-size:.72rem;">+ Add</button>
+      </div>
+      <div class="card-body">
+        <div class="expr-list" id="expr-list"></div>
+        <div class="syntax-ref" style="margin-top:.75rem;">
+          <div class="syntax-ref-title">Syntax Reference</div>
+          <div class="syntax-rows">
+            <div class="syntax-row"><span class="syn-key">sin(x)</span><span class="syn-desc">Sine</span></div>
+            <div class="syntax-row"><span class="syn-key">cos(x)</span><span class="syn-desc">Cosine</span></div>
+            <div class="syntax-row"><span class="syn-key">tan(x)</span><span class="syn-desc">Tangent</span></div>
+            <div class="syntax-row"><span class="syn-key">x^2</span><span class="syn-desc">Power</span></div>
+            <div class="syntax-row"><span class="syn-key">sqrt(x)</span><span class="syn-desc">√x</span></div>
+            <div class="syntax-row"><span class="syn-key">abs(x)</span><span class="syn-desc">|x|</span></div>
+            <div class="syntax-row"><span class="syn-key">log(x)</span><span class="syn-desc">ln(x)</span></div>
+            <div class="syntax-row"><span class="syn-key">log10(x)</span><span class="syn-desc">log₁₀</span></div>
+            <div class="syntax-row"><span class="syn-key">exp(x)</span><span class="syn-desc">eˣ</span></div>
+            <div class="syntax-row"><span class="syn-key">pi</span><span class="syn-desc">π</span></div>
+            <div class="syntax-row"><span class="syn-key">asin(x)</span><span class="syn-desc">arcsin</span></div>
+            <div class="syntax-row"><span class="syn-key">ceil(x)</span><span class="syn-desc">⌈x⌉</span></div>
+            <div class="syntax-row"><span class="syn-key">floor(x)</span><span class="syn-desc">⌊x⌋</span></div>
+            <div class="syntax-row"><span class="syn-key">2*x</span><span class="syn-desc">multiply</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Viewport Controls -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Viewport</span>
+      </div>
+      <div class="card-body">
+        <div class="viewport-controls">
+          <div class="ctrl-group">
+            <span class="ctrl-label">X Range Min</span>
+            <input class="ctrl-input" type="number" id="xmin" value="-10" step="1" />
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">X Range Max</span>
+            <input class="ctrl-input" type="number" id="xmax" value="10" step="1" />
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">Y Range Min</span>
+            <input class="ctrl-input" type="number" id="ymin" value="-8" step="1" />
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">Y Range Max</span>
+            <input class="ctrl-input" type="number" id="ymax" value="8" step="1" />
+          </div>
+          <button class="btn-reset-view" id="apply-range-btn">Apply Range</button>
+          <button class="btn-reset-view" id="reset-view-btn">Reset to Origin</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Preset Functions</span>
+      </div>
+      <div class="card-body">
+        <div class="presets-grid" id="presets-grid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right -->
+  <div class="view-panel">
+
+    <!-- Canvas -->
+    <div class="canvas-card" id="canvas-holder">
+      <canvas id="studio-canvas"></canvas>
+      <div class="canvas-toolbar">
+        <button class="canvas-tool-btn" id="zoom-in-btn" title="Zoom In">+</button>
+        <button class="canvas-tool-btn" id="zoom-out-btn" title="Zoom Out">−</button>
+        <button class="canvas-tool-btn" id="table-btn" title="Value Table">≡</button>
+        <button class="canvas-tool-btn" id="screenshot-btn" title="Save Image">⬇</button>
+      </div>
+      <div class="canvas-info-bar">
+        <span class="canvas-coord" id="coord-display">x: — &nbsp; y: —</span>
+        <span class="canvas-coord" id="scale-display">Scale: 50px/unit</span>
+      </div>
+    </div>
+
+    <!-- Calc -->
+    <div class="calc-card">
+      <div class="calc-screen">
+        <div class="calc-expr-display" id="calc-expr-display"></div>
+        <div class="calc-result-display" id="calc-result-display">0</div>
+      </div>
+
+      <div class="calc-tabs">
+        <button class="calc-tab active" data-tab="basic">Basic</button>
+        <button class="calc-tab" data-tab="sci">Scientific</button>
+        <button class="calc-tab" data-tab="const">Constants</button>
+      </div>
+
+      <div class="calc-grid-wrap">
+        <div class="calc-grid basic-grid" id="calc-pad-basic"></div>
+        <div class="calc-grid sci-grid" id="calc-pad-sci" style="display:none;"></div>
+        <div class="calc-grid const-grid" id="calc-pad-const" style="display:none;"></div>
+        <div class="mem-row" id="mem-row"></div>
+
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.65rem;padding-top:.65rem;border-top:1px solid var(--border-soft);">
+          <span style="font-size:.65rem;font-family:var(--font-mono);color:var(--text-faint);text-transform:uppercase;letter-spacing:.07em;">Angle:</span>
+          <div class="angle-indicator" id="angle-indicator">
+            <span class="angle-pill active" data-mode="rad">RAD</span>
+            <span class="angle-pill" data-mode="deg">DEG</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Sub -->
+<div class="lower-grid">
+
+  <!-- Sesh History -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Session History</span>
+      <button id="clear-hist-btn" style="background:none;border:none;color:var(--text-faint);font-size:.7rem;font-family:var(--font-mono);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;">Clear</button>
+    </div>
+    <div class="card-body" style="padding-top:.75rem;">
+      <div class="history-list" id="hist-list">
+        <div class="hist-empty">No calculations yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Calculator -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Statistics Tools</span>
+    </div>
+    <div class="card-body">
+      <textarea class="stats-textarea" id="stats-input" placeholder="Enter numbers separated by commas or spaces&#10;e.g.  3, 7, 2, 14, 9"></textarea>
+      <button class="btn-stats-calc" id="stats-calc-btn" style="margin-top:.65rem;">Compute Statistics</button>
+      <div class="stats-grid" id="stats-grid" style="margin-top:.65rem;"></div>
+    </div>
+  </div>
+
+  <!-- Bibl -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Study Resources</span>
+    </div>
+    <div class="card-body" style="padding-top:.75rem;">
+      <div class="bib-list" id="bib-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Values -->
+<div class="modal-overlay" id="table-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Value Table</span>
+      <button class="modal-close" id="close-modal">×</button>
+    </div>
+    <div class="table-controls">
+      <div class="ctrl-group">
+        <span class="ctrl-label">From x</span>
+        <input class="ctrl-input" type="number" id="tbl-from" value="-5" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">To x</span>
+        <input class="ctrl-input" type="number" id="tbl-to" value="5" />
+      </div>
+      <div class="ctrl-group">
+        <span class="ctrl-label">Step</span>
+        <input class="ctrl-input" type="number" id="tbl-step" value="1" step="0.5" min="0.01" />
+      </div>
+      <button class="btn-stats-calc" id="gen-table-btn" style="align-self:flex-end;">Generate</button>
+    </div>
+    <div class="table-wrap" id="table-wrap">
+      <div style="text-align:center;padding:2rem;font-family:var(--font-mono);font-size:.8rem;color:var(--text-faint);">Configure range and click Generate</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+class MathEngine {
+  constructor() {
+    this.angleMode = "rad"; // "rad" Or "deg"
+    this.memory = 0;
+    this.hasMemory = false;
+  }
+
+  /* Angle conversion */
+  toRad(a) {
+    return this.angleMode === "deg" ? a * Math.PI / 180 : a;
+  }
+
+  /* idk */
+  parse(expr) {
+    const src = this._preprocess(expr);
+    let pos = 0;
+
+    const peek  = () => src[pos] || "";
+    const next  = () => src[pos++];
+    const skip  = (s) => { if (src.startsWith(s, pos)) { pos += s.length; return true; } return false; };
+    const isDigitOrDot = (c) => (c >= "0" && c <= "9") || c === ".";
+
+    const parseNumber = () => {
+      let s = "";
+      if (peek() === "-" && (s.length === 0)) { s += next(); }
+      while (isDigitOrDot(peek())) s += next();
+      if (peek() === "e" || peek() === "E") {
+        s += next();
+        if (peek() === "+" || peek() === "-") s += next();
+        while (isDigitOrDot(peek())) s += next();
+      }
+      return parseFloat(s);
+    };
+
+    const parseAtom = () => {
+      while (peek() === " ") pos++;
+
+      // unary minus
+      if (peek() === "-") {
+        pos++;
+        return -parseAtom();
+      }
+      // unary plus
+      if (peek() === "+") {
+        pos++;
+        return parseAtom();
+      }
+
+      // Parenthesised group
+      if (peek() === "(") {
+        pos++;
+        const val = parseExpr();
+        if (peek() === ")") pos++;
+        return val;
+      }
+
+      // Named functions and constants
+      const funcs = [
+        "asin","acos","atan2","atan","sinh","cosh","tanh",
+        "sin","cos","tan","sqrt","cbrt","abs","exp",
+        "log10","log2","log","ceil","floor","round","sign","hypot"
+      ];
+      for (const fn of funcs) {
+        if (src.startsWith(fn, pos)) {
+          pos += fn.length;
+          while (peek() === " ") pos++;
+          if (peek() === "(") {
+            pos++;
+            const a = parseExpr();
+            // two-arg fc
+            let b = NaN;
+            if (fn === "atan2" || fn === "hypot") {
+              if (peek() === ",") { pos++; b = parseExpr(); }
+            }
+            if (peek() === ")") pos++;
+            return this._callFn(fn, a, b);
+          } else {
+            // pi & e
+          }
+        }
+      }
+
+      // Consts
+      if (src.startsWith("pi", pos)) { pos += 2; return Math.PI; }
+      if (src.startsWith("tau", pos)) { pos += 3; return 2 * Math.PI; }
+      if (src.startsWith("phi", pos)) { pos += 3; return (1 + Math.sqrt(5)) / 2; }
+      if (src[pos] === "e" && !/[a-z]/i.test(src[pos+1] || "")) { pos++; return Math.E; }
+
+      // X
+      if (peek() === "x") { pos++; return this._xVal; }
+
+      // Nr lit
+      if (isDigitOrDot(peek())) return parseNumber();
+
+      throw new Error("Unexpected token: " + peek());
+    };
+
+    const parsePower = () => {
+      let base = parseAtom();
+      while (peek() === "^") {
+        pos++;
+        const exp = parseAtom();
+        base = Math.pow(base, exp);
+      }
+      return base;
+    };
+
+    const parseMulDiv = () => {
+      let val = parsePower();
+      while (true) {
+        while (peek() === " ") pos++;
+        if (peek() === "*") { pos++; val *= parsePower(); }
+        else if (peek() === "/") { pos++; val /= parsePower(); }
+        else if (peek() === "%") { pos++; val %= parsePower(); }
+        else break;
+      }
+      return val;
+    };
+
+    const parseExpr = () => {
+      let val = parseMulDiv();
+      while (true) {
+        while (peek() === " ") pos++;
+        if (peek() === "+") { pos++; val += parseMulDiv(); }
+        else if (peek() === "-") { pos++; val -= parseMulDiv(); }
+        else break;
+      }
+      return val;
+    };
+
+    return parseExpr;
+  }
+
+  _preprocess(raw) {
+    let s = raw.trim()
+      .toLowerCase()
+      .replace(/π/g, "pi")
+      .replace(/÷/g, "/")
+      .replace(/×/g, "*")
+      .replace(/–/g, "-")
+      // implicit multiplication
+      .replace(/(\d)(x)/g, "$1*$2")
+      .replace(/(\d)(\()/g, "$1*$2")
+      .replace(/(\))(\()/g, "$1*$2")
+      .replace(/(\))(\d)/g, "$1*$2")
+      .replace(/(x)(x)/g, "x*x")
+      .replace(/(\d)(pi|tau|phi|e)\b/g, "$1*$2")
+      .replace(/\b(pi|tau|phi|e)(\d)/g, "$1*$2");
+
+    return s;
+  }
+
+  _callFn(fn, a, b) {
+    const r = (v) => this.toRad(v);
+    switch(fn) {
+      case "sin":   return Math.sin(r(a));
+      case "cos":   return Math.cos(r(a));
+      case "tan":   return Math.tan(r(a));
+      case "asin":  return this.angleMode === "deg" ? Math.asin(a) * 180 / Math.PI : Math.asin(a);
+      case "acos":  return this.angleMode === "deg" ? Math.acos(a) * 180 / Math.PI : Math.acos(a);
+      case "atan":  return this.angleMode === "deg" ? Math.atan(a) * 180 / Math.PI : Math.atan(a);
+      case "atan2": return this.angleMode === "deg" ? Math.atan2(a,b) * 180 / Math.PI : Math.atan2(a,b);
+      case "sinh":  return Math.sinh(a);
+      case "cosh":  return Math.cosh(a);
+      case "tanh":  return Math.tanh(a);
+      case "sqrt":  return Math.sqrt(a);
+      case "cbrt":  return Math.cbrt(a);
+      case "abs":   return Math.abs(a);
+      case "exp":   return Math.exp(a);
+      case "log":   return Math.log(a);
+      case "log10": return Math.log10(a);
+      case "log2":  return Math.log2(a);
+      case "ceil":  return Math.ceil(a);
+      case "floor": return Math.floor(a);
+      case "round": return Math.round(a);
+      case "sign":  return Math.sign(a);
+      case "hypot": return Math.hypot(a, isNaN(b) ? 0 : b);
+      default: throw new Error("Unknown function: " + fn);
+    }
+  }
+
+  /* No x */
+  evaluate(expr) {
+    if (!expr || !expr.trim()) return null;
+    try {
+      this._xVal = NaN;
+      const fn = this.parse(expr.trim());
+      const result = fn();
+      if (typeof result !== "number" || isNaN(result)) return null;
+      return result;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  /* Format */
+  format(val, dp = 10) {
+    if (val === null || val === undefined) return "Error";
+    if (!isFinite(val)) return val > 0 ? "∞" : "-∞";
+    if (isNaN(val)) return "Error";
+    // present clean
+    if (Number.isInteger(val)) return val.toString();
+    const str = val.toPrecision(dp);
+    return parseFloat(str).toString();
+  }
+
+  /* f(x) from string */
+  compileFunction(raw) {
+    if (!raw || !raw.trim()) return { valid: false };
+    // strip common prefixes
+    let body = raw.trim()
+      .replace(/^f\s*\(\s*x\s*\)\s*=\s*/i, "")
+      .replace(/^y\s*=\s*/i, "")
+      .replace(/^g\s*\(\s*x\s*\)\s*=\s*/i, "")
+      .replace(/^h\s*\(\s*x\s*\)\s*=\s*/i, "");
+
+    if (!body) return { valid: false };
+
+    try {
+      this._xVal = 1;
+      const parseFn = this.parse(body);
+      parseFn();
+
+      const engine = this;
+      const fn = (x) => {
+        engine._xVal = x;
+        try {
+          const p = engine.parse(body);
+          const v = p();
+          return (typeof v === "number" && isFinite(v)) ? v : NaN;
+        } catch(e) { return NaN; }
+      };
+
+      return { valid: true, fn, body };
+    } catch(e) {
+      return { valid: false, error: e.message };
+    }
+  }
+
+  /* Memory */
+  memStore(val)   { this.memory = val; this.hasMemory = true; }
+  memRecall()     { return this.hasMemory ? this.memory : 0; }
+  memClear()      { this.memory = 0; this.hasMemory = false; }
+  memAdd(val)     { this.memory += val; this.hasMemory = true; }
+}
+
+class GraphRenderer {
+  constructor(canvas, engine) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.engine = engine;
+    this.dpr = window.devicePixelRatio || 1;
+    this.scale = 50;        // px / unit
+    this.offsetX = 0;       // canvas-px offset of x=0
+    this.offsetY = 0;       // canvas-px offset of y=0
+    this.isPanning = false;
+    this.panStartX = 0;
+    this.panStartY = 0;
+    this.logicalW = 0;
+    this.logicalH = 0;
+    this._mouseX = null;
+    this._mouseY = null;
+    this._hoveredPoint = null;
+  }
+
+  resize(holderEl) {
+    const dpr = this.dpr;
+    const w = holderEl.clientWidth;
+    const h = holderEl.clientHeight;
+    this.logicalW = w;
+    this.logicalH = h;
+    this.canvas.width  = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this.canvas.style.width  = w + "px";
+    this.canvas.style.height = h + "px";
+    if (this.offsetX === 0 && this.offsetY === 0) {
+      this.offsetX = w / 2;
+      this.offsetY = h / 2;
+    }
+  }
+
+  resetView() {
+    this.offsetX = this.logicalW / 2;
+    this.offsetY = this.logicalH / 2;
+    this.scale   = 50;
+  }
+
+  /* Range */
+  applyRange(xMin, xMax, yMin, yMax) {
+    const w = this.logicalW, h = this.logicalH;
+    const scaleX = w / (xMax - xMin);
+    const scaleY = h / (yMax - yMin);
+    this.scale   = Math.min(scaleX, scaleY);
+    this.offsetX = -xMin * this.scale;
+    this.offsetY =  yMax * this.scale;
+  }
+
+  zoom(factor, cx, cy) {
+    if (cx === undefined) { cx = this.logicalW / 2; cy = this.logicalH / 2; }
+    const mx = (cx - this.offsetX) / this.scale;
+    const my = (this.offsetY - cy) / this.scale;
+    this.scale   = Math.min(Math.max(this.scale * factor, 6), 800);
+    this.offsetX = cx - mx * this.scale;
+    this.offsetY = cy + my * this.scale;
+  }
+
+  /* Draw */
+  draw(expressions) {
+    const { ctx, dpr } = this;
+    const lW = this.logicalW, lH = this.logicalH;
+    const sc = this.scale, ox = this.offsetX, oy = this.offsetY;
+
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Clear
+    const theme = document.body.getAttribute("data-theme") || "brown";
+    const isA11y = document.body.classList.contains("a11y-on");
+    ctx.fillStyle = isA11y ? "#000" : this._canvasBg(theme);
+    ctx.fillRect(0, 0, lW, lH);
+
+    // Grid
+    this._drawGrid(isA11y, theme, lW, lH, sc, ox, oy);
+
+    // Axes
+    this._drawAxes(isA11y, theme, lW, lH, sc, ox, oy);
+
+    // Snap
+    this._computeHoverSnap(expressions, lW, lH, sc, ox, oy);
+
+    // Functions + dots
+    expressions.forEach(item => {
+      if (item.fn) this._drawFunction(item, isA11y, lW, lH, sc, ox, oy);
+    });
+
+    // Crosshair
+    if (this._mouseX !== null) {
+      this._drawCrosshair(isA11y, lW, lH);
+    }
+
+    // Hover priority
+    if (this._hoveredPoint) {
+      this._drawHoverTooltip(isA11y, lW, lH);
+    }
+
+    ctx.restore();
+  }
+
+  _canvasBg(theme) {
+    const map = {
+      brown: "#0d0c0c", obsidian: "#050505", matte: "#111",
+      ivory: "#ede6d8", ocean: "#010810", marine: "#020e0e"
+    };
+    return map[theme] || "#0d0c0c";
+  }
+
+  _drawGrid(isA11y, theme, W, H, sc, ox, oy) {
+    const ctx = this.ctx;
+    const gridAlpha = isA11y ? 0.15 : 0.04;
+    const axisAlpha = isA11y ? 1    : 0.3;
+
+    ctx.strokeStyle = isA11y ? `rgba(255,255,255,${gridAlpha})` : this._gridColor(theme, gridAlpha);
+    ctx.lineWidth = 1;
+
+    let step = sc;
+    if (sc < 20) step = sc * Math.ceil(40 / sc);
+    if (sc > 200) step = sc / Math.floor(sc / 100);
+
+    // Vertical gl
+    const x0 = (((-ox) % step) + step) % step;
+    for (let x = x0; x <= W; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+
+    // Horizontal gl
+    const y0 = (((-oy) % step) + step) % step;
+    for (let y = y0; y <= H; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+
+  _drawAxes(isA11y, theme, W, H, sc, ox, oy) {
+    const ctx = this.ctx;
+    const axisColor = isA11y ? "#ffff00" : this._axisColor(theme);
+
+    ctx.strokeStyle = axisColor;
+    ctx.lineWidth = isA11y ? 2.5 : 1.5;
+
+    // X axis
+    ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke();
+    // Y axis
+    ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, H); ctx.stroke();
+
+    // Tick
+    ctx.fillStyle = isA11y ? "#ffffff" : this._labelColor(theme);
+    ctx.font = isA11y ? "bold 12px monospace" : "10px 'JetBrains Mono', monospace";
+
+    let step = sc;
+    if (sc < 20) step = sc * Math.ceil(40 / sc);
+    if (sc > 200) step = sc / Math.floor(sc / 100);
+
+    const unitStep = step / sc;
+
+    // X labels
+    const xi0 = (((-ox) % step) + step) % step;
+    for (let px = xi0; px <= W; px += step) {
+      const val = (px - ox) / sc;
+      if (Math.abs(val) < 1e-9) continue;
+      const label = this._formatLabel(val);
+      ctx.fillText(label, px + 3, Math.min(Math.max(oy + 14, 14), H - 4));
+    }
+
+    // Y labels
+    const yi0 = (((-oy) % step) + step) % step;
+    for (let py = yi0; py <= H; py += step) {
+      const val = (oy - py) / sc;
+      if (Math.abs(val) < 1e-9) continue;
+      const label = this._formatLabel(val);
+      ctx.fillText(label, Math.min(Math.max(ox + 4, 4), W - 40), py - 3);
+    }
+
+    // Axis arrows
+    const aw = isA11y ? 8 : 6;
+    ctx.fillStyle = axisColor;
+    // Right arrow
+    ctx.beginPath(); ctx.moveTo(W, oy);
+    ctx.lineTo(W - aw, oy - aw/2); ctx.lineTo(W - aw, oy + aw/2); ctx.fill();
+    // Top arrow
+    ctx.beginPath(); ctx.moveTo(ox, 0);
+    ctx.lineTo(ox - aw/2, aw); ctx.lineTo(ox + aw/2, aw); ctx.fill();
+  }
+
+  _formatLabel(val) {
+    if (Math.abs(val) >= 10000 || (Math.abs(val) < 0.01 && val !== 0)) {
+      return val.toExponential(1);
+    }
+    const s = parseFloat(val.toFixed(4)).toString();
+    return s;
+  }
+
+  _gridColor(theme, alpha) {
+    const map = { ivory: `rgba(46,41,34,${alpha})`, ocean: `rgba(56,200,248,${alpha * 1.5})`, marine: `rgba(0,240,192,${alpha * 1.2})` };
+    return map[theme] || `rgba(255,255,255,${alpha})`;
+  }
+
+  _axisColor(theme) {
+    const map = { ivory: "rgba(46,41,34,.3)", ocean: "rgba(56,200,248,.38)", marine: "rgba(0,240,192,.38)" };
+    return map[theme] || "rgba(255,255,255,.28)";
+  }
+
+  _labelColor(theme) {
+    return theme === "ivory" ? "rgba(46,41,34,.55)" : "rgba(255,255,255,.38)";
+  }
+
+  _drawFunction(item, isA11y, W, H, sc, ox, oy) {
+    const ctx = this.ctx;
+    const color = isA11y ? "#ffffff" : item.color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isA11y ? 4 : 2.2;
+    ctx.beginPath();
+
+    let penDown = false;
+    let prevY = null;
+
+    for (let px = 0; px <= W; px += 1) {
+      const mathX = (px - ox) / sc;
+      const mathY = item.fn(mathX);
+
+      if (mathY === null || isNaN(mathY)) {
+        penDown = false;
+        prevY = null;
+        continue;
+      }
+
+      const py = oy - mathY * sc;
+
+      // Error handle
+      if (penDown && prevY !== null && Math.abs(py - prevY) > H * 2) {
+        penDown = false;
+      }
+
+      if (!penDown) {
+        ctx.moveTo(px, py);
+        penDown = true;
+      } else {
+        ctx.lineTo(px, py);
+      }
+      prevY = py;
+    }
+
+    ctx.stroke();
+
+    // X & Y intersection only
+    this._drawAxisIntersections(item, isA11y, W, H, sc, ox, oy);
+  }
+
+  /* y for x=0,
+     x for y=0 */
+  _drawAxisIntersections(item, isA11y, W, H, sc, ox, oy) {
+    const ctx = this.ctx;
+    const color = isA11y ? "#ffff00" : item.color;
+    const fn = item.fn;
+
+    // X something
+    const xStart = (-ox) / sc;
+    const xEnd   = (W - ox) / sc;
+    const steps  = Math.min(Math.round((xEnd - xStart) * 60), 4000);
+    const dx     = (xEnd - xStart) / steps;
+
+    const pts = [];   // mX and mY
+
+    // y0-int
+    if (xStart <= 0 && xEnd >= 0) {
+      const y0 = fn(0);
+      if (isFinite(y0) && !isNaN(y0)) {
+        pts.push({ mathX: 0, mathY: y0 });
+      }
+    }
+
+    // x0-int bis
+    let prevY = fn(xStart);
+    let prevX = xStart;
+
+    for (let i = 1; i <= steps; i++) {
+      const cx = xStart + i * dx;
+      const cy = fn(cx);
+
+      if (!isFinite(prevY) || !isFinite(cy) || isNaN(prevY) || isNaN(cy)) {
+        prevX = cx; prevY = cy;
+        continue;
+      }
+
+      if (prevY * cy < 0) {
+        let lo = prevX, hi = cx;
+        for (let b = 0; b < 42; b++) {
+          const mid = (lo + hi) / 2;
+          const mv  = fn(mid);
+          if (fn(lo) * mv <= 0) hi = mid;
+          else lo = mid;
+          if (hi - lo < 1e-9) break;
+        }
+        const rootX = (lo + hi) / 2;
+        const rootY = fn(rootX);
+        // !discontinuation
+        if (Math.abs(rootY) < Math.abs(cy - prevY) * 0.1 + 1e-4) {
+          pts.push({ mathX: rootX, mathY: 0 });
+        }
+      }
+
+      // Holy 0
+      if (cy === 0) {
+        pts.push({ mathX: cx, mathY: 0 });
+      }
+
+      prevX = cx; prevY = cy;
+    }
+
+    // DeDub for close f's
+    const unique = [];
+    for (const p of pts) {
+      if (!unique.some(u => Math.abs(u.mathX - p.mathX) < 1e-4 && Math.abs(u.mathY - p.mathY) < 1e-4)) {
+        unique.push(p);
+      }
+    }
+
+    // Dot.
+    for (const p of unique) {
+      const px = ox + p.mathX * sc;
+      const py = oy - p.mathY * sc;
+
+      if (px < -8 || px > W + 8 || py < -8 || py > H + 8) continue;
+
+      const isHovered = this._hoveredPoint &&
+        Math.abs(this._hoveredPoint.mathX - p.mathX) < 1e-3 &&
+        Math.abs(this._hoveredPoint.mathY - p.mathY) < 1e-3 &&
+        this._hoveredPoint.color === color;
+
+      const r = isHovered ? (isA11y ? 9 : 7) : (isA11y ? 6 : 5);
+
+      // Cutie glow
+      if (isHovered) {
+        ctx.beginPath();
+        ctx.arc(px, py, r + 4, 0, 2 * Math.PI);
+        ctx.strokeStyle = isA11y ? "rgba(255,255,0,.35)" : color.replace(")", ", 0.28)").replace("rgb", "rgba");
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, 2 * Math.PI);
+      ctx.strokeStyle = isA11y ? "#000" : "rgba(0,0,0,.55)";
+      ctx.lineWidth = isHovered ? 2 : 1.5;
+      ctx.stroke();
+    }
+
+    // Store
+    item._axisPoints = unique;
+  }
+
+  // Cursor hover
+  _computeHoverSnap(expressions, W, H, sc, ox, oy) {
+    if (this._mouseX === null) { this._hoveredPoint = null; return; }
+
+    const mx = this._mouseX;
+    const my = this._mouseY;
+    const SNAP_PX = 18;   // snap px
+    const isA11y  = document.body.classList.contains("a11y-on");
+
+    let best = null;
+    let bestDist = Infinity;
+
+    for (const item of expressions) {
+      if (!item.fn || !item._axisPoints) continue;
+      for (const p of item._axisPoints) {
+        const px = ox + p.mathX * sc;
+        const py = oy - p.mathY * sc;
+        const dist = Math.hypot(mx - px, my - py);
+        if (dist < SNAP_PX && dist < bestDist) {
+          bestDist = dist;
+          best = { px, py, mathX: p.mathX, mathY: p.mathY, color: isA11y ? "#ffff00" : item.color };
+        }
+      }
+    }
+
+    this._hoveredPoint = best;
+  }
+  _drawHoverTooltip(isA11y, W, H) {
+    const ctx = this.ctx;
+    const pt  = this._hoveredPoint;
+    if (!pt) return;
+
+    const fmt = (v) => {
+      if (Math.abs(v) < 1e-9) return "0";
+      if (Number.isInteger(v)) return v.toString();
+      return parseFloat(v.toPrecision(6)).toString();
+    };
+
+    const label = `(${fmt(pt.mathX)}, ${fmt(pt.mathY)})`;
+    const font  = isA11y ? "bold 13px monospace" : "bold 12px 'JetBrains Mono', monospace";
+    ctx.font = font;
+    const tw = ctx.measureText(label).width;
+
+    const PAD  = 8;
+    const bw   = tw + PAD * 2;
+    const bh   = 24;
+    const TIP  = 6;   // LE TRIANGLE
+
+    // Above-point pref
+    let bx = pt.px + 14;
+    let by = pt.py - bh - TIP - 6;
+    if (bx + bw > W - 4) bx = pt.px - bw - 14;
+    if (by < 4) by = pt.py + TIP + 6;
+
+    // TT
+    const bg = isA11y ? "#ffff00" : "#1a1818";
+    const fg = isA11y ? "#000"    : pt.color;
+    const borderColor = isA11y ? "#000" : pt.color;
+
+    ctx.save();
+    ctx.beginPath();
+    this._roundRect(ctx, bx, by, bw, bh, 5);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Text
+    ctx.fillStyle = fg;
+    ctx.font = font;
+    ctx.fillText(label, bx + PAD, by + bh / 2 + 4);
+
+    // Dot. Sequel
+    ctx.beginPath();
+    ctx.arc(pt.px, pt.py, isA11y ? 9 : 7, 0, 2 * Math.PI);
+    ctx.strokeStyle = isA11y ? "#ffff00" : pt.color;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Corect path
+  _roundRect(ctx, x, y, w, h, r) {
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  _drawCrosshair(isA11y, W, H) {
+    const ctx = this.ctx;
+    const x = this._mouseX, y = this._mouseY;
+    ctx.strokeStyle = isA11y ? "#ffff00" : "rgba(255,255,255,.2)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+const Stats = {
+  parse(str) {
+    return str.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n !== null);
+  },
+  mean(arr) { return arr.reduce((a,b) => a+b, 0) / arr.length; },
+  median(arr) {
+    const s = [...arr].sort((a,b) => a-b);
+    const m = Math.floor(s.length / 2);
+    return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+  },
+  stddev(arr) {
+    const m = this.mean(arr);
+    return Math.sqrt(arr.reduce((a,b) => a + (b-m)**2, 0) / arr.length);
+  },
+  variance(arr) { return this.stddev(arr) ** 2; },
+  mode(arr) {
+    const freq = {};
+    arr.forEach(n => freq[n] = (freq[n] || 0) + 1);
+    const maxF = Math.max(...Object.values(freq));
+    const modes = Object.keys(freq).filter(k => freq[k] === maxF).map(Number);
+    return modes.length === arr.length ? "None" : modes.join(", ");
+  },
+  range(arr) { return Math.max(...arr) - Math.min(...arr); },
+  sum(arr) { return arr.reduce((a,b) => a+b, 0); }
+};
+
+function prettyNum(n, dp = 6) {
+  if (!isFinite(n)) return n > 0 ? "∞" : "-∞";
+  if (Number.isInteger(n)) return n.toString();
+  return parseFloat(n.toPrecision(dp)).toString();
+}
+
+const SUP_MAP = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻"};
+
+function toDisplay(s) {
+  return s
+    .replace(/\bpi\b/gi, "π")
+    .replace(/\bsqrt\(/g, "√(")
+    .replace(/\babs\(/g, "|")
+    .replace(/\blog10\(/g, "log₁₀(")
+    .replace(/\bexp\(/g, "e^(")
+    .replace(/\^([0-9\-+]+)/g, (m,p) => p.split("").map(c => SUP_MAP[c] || c).join(""));
+}
+
+const mathEngine = new MathEngine();
+const canvasEl   = document.getElementById("studio-canvas");
+const holder     = document.getElementById("canvas-holder");
+const renderer   = new GraphRenderer(canvasEl, mathEngine);
+
+const PALETTE = [
+  "#d4a373","#34d399","#f87171","#c084fc",
+  "#fbbf24","#22d3ee","#ff9f7f","#a78bfa",
+  "#86efac","#f472b6"
+];
+
+const THEMES = [
+  { key:"brown",   label:"Brown"               },
+  { key:"void", label:"Void"                   },
+  { key:"matte",   label:"Matte"               },
+  { key:"light-brown",   label:"light-brown"   },
+  { key:"ocean",   label:"Ocean"               },
+  { key:"marine",  label:"Marine"              }
+];
+
+const PRESETS = [
+  { label:"Sine",           expr:"f(x) = sin(x)",          },
+  { label:"Parabola",       expr:"y = x^2 - 3"             },
+  { label:"|Absolute|",     expr:"f(x) = abs(x)"           },
+  { label:"Cubic",          expr:"f(x) = x^3 - 3*x"        },
+  { label:"Damped Wave",    expr:"f(x) = sin(x)/x"         },
+  { label:"Square Root",    expr:"y = sqrt(x)"             },
+  { label:"Exponential",    expr:"y = exp(x)"              },
+  { label:"Logarithm",      expr:"y = log(x)"              },
+  { label:"Hyperbola",      expr:"y = 1/x"                 },
+  { label:"Gaussian",       expr:"y = exp(-x^2)"           },
+  { label:"Tan(x)",         expr:"f(x) = tan(x)"           },
+  { label:"Sigmoid",        expr:"y = 1/(1+exp(-x))"       }
+];
+
+const BIBLIOGRAPHY = [
+  { title: "GeoGebra Graphing Calculator", url: "https://www.geogebra.org", desc: "Interactive platform for geometry, vectors, and real analytic function visualization." },
+  { title: "Khan Academy — Calculus", url: "https://www.khanacademy.org", desc: "Step-by-step video lessons covering limits, derivatives, integrals, and series." },
+  { title: "Wolfram|Alpha Engine", url: "https://www.wolframalpha.com", desc: "Advanced computational engine for symbolic math, critical points, and domain analysis." },
+  { title: "Desmos Graphing Calculator", url: "https://www.desmos.com/calculator", desc: "Browser-based high-quality graphing with sliders and regression tools." },
+  { title: "Paul's Online Math Notes", url: "https://tutorial.math.lamar.edu", desc: "Clear, comprehensive notes on calculus and differential equations." },
+  { title: "MIT OpenCourseWare 18.01", url: "https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/", desc: "Full MIT single-variable calculus course, free with problem sets and exams." }
+];
+
+let expressions   = [];
+let calcExpr      = "";
+let sessionHistory = [];
+let activeTab     = "basic";
+
+function buildThemeStrip() {
+  const strip = document.getElementById("theme-strip");
+  const current = document.body.getAttribute("data-theme") || "brown";
+  strip.innerHTML = "";
+  THEMES.forEach(t => {
+    const btn = document.createElement("button");
+    btn.className = "theme-btn" + (t.key === current ? " active" : "");
+    btn.textContent = t.label;
+    btn.onclick = () => {
+      document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.body.setAttribute("data-theme", t.key);
+      renderer.draw(expressions);
+    };
+    strip.appendChild(btn);
+  });
+}
+
+document.getElementById("a11y-toggle").onclick = () => {
+  const on = document.body.classList.toggle("a11y-on");
+  document.getElementById("a11y-pill").textContent = on ? "ON" : "OFF";
+  renderer.draw(expressions);
+};
+
+function initCanvas() {
+  renderer.resize(holder);
+  renderer.draw(expressions);
+}
+
+window.addEventListener("resize", initCanvas);
+
+// Mouse pan
+canvasEl.addEventListener("mousedown", e => {
+  renderer.isPanning = true;
+  renderer.panStartX = e.clientX - renderer.offsetX;
+  renderer.panStartY = e.clientY - renderer.offsetY;
+  canvasEl.style.cursor = "grabbing";
+});
+window.addEventListener("mousemove", e => {
+  const rect = canvasEl.getBoundingClientRect();
+  // Only track when inside canvas
+  const lx = e.clientX - rect.left;
+  const ly = e.clientY - rect.top;
+  const insideCanvas = lx >= 0 && lx <= rect.width && ly >= 0 && ly <= rect.height;
+
+  if (insideCanvas) {
+    renderer._mouseX = lx;
+    renderer._mouseY = ly;
+  }
+
+  const mx = (lx - renderer.offsetX) / renderer.scale;
+  const my = (renderer.offsetY - ly) / renderer.scale;
+
+  if (insideCanvas) {
+    document.getElementById("coord-display").textContent = `x: ${prettyNum(mx,4)} · y: ${prettyNum(my,4)}`;
+  }
+
+  if (renderer.isPanning) {
+    renderer.offsetX = e.clientX - renderer.panStartX;
+    renderer.offsetY = e.clientY - renderer.panStartY;
+  }
+
+  renderer.draw(expressions);
+
+  // Update cursor
+  if (!renderer.isPanning) {
+    canvasEl.style.cursor = renderer._hoveredPoint ? "pointer" : "crosshair";
+  }
+});
+window.addEventListener("mouseup", () => {
+  renderer.isPanning = false;
+  canvasEl.style.cursor = "crosshair";
+});
+canvasEl.addEventListener("mouseleave", () => {
+  renderer._mouseX = null;
+  renderer._mouseY = null;
+  renderer.draw(expressions);
+  document.getElementById("coord-display").textContent = "x: — · y: —";
+});
+
+// Touch pan
+canvasEl.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) return;
+  renderer.isPanning = true;
+  renderer.panStartX = e.touches[0].clientX - renderer.offsetX;
+  renderer.panStartY = e.touches[0].clientY - renderer.offsetY;
+}, { passive: true });
+window.addEventListener("touchmove", e => {
+  if (!renderer.isPanning || e.touches.length !== 1) return;
+  renderer.offsetX = e.touches[0].clientX - renderer.panStartX;
+  renderer.offsetY = e.touches[0].clientY - renderer.panStartY;
+  renderer.draw(expressions);
+}, { passive: true });
+window.addEventListener("touchend", () => { renderer.isPanning = false; });
+
+// Scroll to zoom
+canvasEl.addEventListener("wheel", e => {
+  e.preventDefault();
+  const rect  = canvasEl.getBoundingClientRect();
+  const cx    = e.clientX - rect.left;
+  const cy    = e.clientY - rect.top;
+  const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  renderer.zoom(factor, cx, cy);
+  document.getElementById("scale-display").textContent = `Scale: ${Math.round(renderer.scale)}px/unit`;
+  renderer.draw(expressions);
+}, { passive: false });
+
+// Toolbar buttons
+document.getElementById("zoom-in-btn").onclick  = () => { renderer.zoom(1.3); renderer.draw(expressions); };
+document.getElementById("zoom-out-btn").onclick = () => { renderer.zoom(1/1.3); renderer.draw(expressions); };
+
+document.getElementById("reset-view-btn").onclick = () => {
+  renderer.resetView();
+  renderer.draw(expressions);
+};
+
+document.getElementById("apply-range-btn").onclick = () => {
+  const xMin = parseFloat(document.getElementById("xmin").value);
+  const xMax = parseFloat(document.getElementById("xmax").value);
+  const yMin = parseFloat(document.getElementById("ymin").value);
+  const yMax = parseFloat(document.getElementById("ymax").value);
+  if (isNaN(xMin)||isNaN(xMax)||isNaN(yMin)||isNaN(yMax)) return;
+  if (xMin >= xMax || yMin >= yMax) return;
+  renderer.applyRange(xMin, xMax, yMin, yMax);
+  renderer.draw(expressions);
+};
+
+document.getElementById("screenshot-btn").onclick = () => {
+  // Redraw
+  renderer.draw(expressions);
+  const link = document.createElement("a");
+  link.download = "analytical-graph.png";
+  link.href = canvasEl.toDataURL("image/png");
+  link.click();
+};
+
+function compileExpression(item) {
+  const result = mathEngine.compileFunction(item.raw);
+  if (result.valid) {
+    item.fn    = result.fn;
+    item.error = "";
+  } else {
+    item.fn    = null;
+    item.error = result.error || "Invalid syntax";
+  }
+}
+
+function renderExpressionList() {
+  const list = document.getElementById("expr-list");
+  list.innerHTML = "";
+
+  if (expressions.length === 0) {
+    list.innerHTML = `<div style="font-family:var(--font-mono);font-size:.75rem;color:var(--text-faint);padding:.5rem 0;text-align:center;">No expressions — click + Add</div>`;
+    return;
+  }
+
+  expressions.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "expr-row";
+
+    const swatch = document.createElement("div");
+    swatch.className = "color-swatch";
+    swatch.style.backgroundColor = item.color;
+
+    const inner = document.createElement("div");
+    inner.className = "expr-inner";
+
+    const label = document.createElement("div");
+    label.className = "expr-label";
+    label.textContent = `f${idx + 1}(x)`;
+
+    const input = document.createElement("input");
+    input.className = "expr-input";
+    input.type = "text";
+    input.value = item.raw;
+    input.placeholder = "f(x) = sin(x) ...";
+    input.setAttribute("autocomplete", "off");
+    input.setAttribute("spellcheck", "false");
+
+    input.addEventListener("input", () => {
+      item.raw = input.value;
+      compileExpression(item);
+      err.textContent = item.raw ? item.error : "";
+      updateInfo(item, infoDiv);
+      renderer.draw(expressions);
+    });
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const next = expressions[idx + 1];
+        if (next) {
+          // focus next
+          const rows = document.querySelectorAll(".expr-input");
+          if (rows[idx + 1]) rows[idx + 1].focus();
+        } else {
+          addExpression();
+        }
+      }
+    });
+
+    const err = document.createElement("div");
+    err.className = "expr-error";
+    err.textContent = item.raw ? item.error : "";
+
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "expr-info";
+    updateInfo(item, infoDiv);
+
+    inner.appendChild(label);
+    inner.appendChild(input);
+    inner.appendChild(err);
+    inner.appendChild(infoDiv);
+
+    const rm = document.createElement("button");
+    rm.className = "btn-remove-expr";
+    rm.innerHTML = "×";
+    rm.title = "Remove";
+    rm.onclick = () => {
+      expressions = expressions.filter(i => i.id !== item.id);
+      renderExpressionList();
+      renderer.draw(expressions);
+    };
+
+    row.appendChild(swatch);
+    row.appendChild(inner);
+    row.appendChild(rm);
+    list.appendChild(row);
+  });
+}
+
+function updateInfo(item, infoDiv) {
+  if (!item.fn || !item.raw) { infoDiv.textContent = ""; return; }
+  try {
+    const at0 = item.fn(0);
+    const at1 = item.fn(1);
+    const parts = [];
+    if (isFinite(at0)) parts.push(`f(0)=${prettyNum(at0,4)}`);
+    if (isFinite(at1)) parts.push(`f(1)=${prettyNum(at1,4)}`);
+    infoDiv.textContent = parts.join("  ·  ");
+  } catch(e) { infoDiv.textContent = ""; }
+}
+
+function addExpression(raw = "") {
+  const id = Math.random().toString(36).slice(2, 9);
+  const color = PALETTE[expressions.length % PALETTE.length];
+  const item = { id, raw, color, fn: null, error: "" };
+  if (raw) compileExpression(item);
+  expressions.push(item);
+  renderExpressionList();
+  renderer.draw(expressions);
+  // Auto-focus
+  setTimeout(() => {
+    const inputs = document.querySelectorAll(".expr-input");
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+
+document.getElementById("add-expr-btn").onclick = () => addExpression();
+
+function buildPresets() {
+  const grid = document.getElementById("presets-grid");
+  grid.innerHTML = "";
+  PRESETS.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "preset-btn";
+    btn.innerHTML = `${p.label}<span class="preset-expr">${p.expr}</span>`;
+    btn.onclick = () => { addExpression(p.expr); };
+    grid.appendChild(btn);
+  });
+}
+
+const BASIC_KEYS = [
+  {l:"7",v:"7"}, {l:"8",v:"8"}, {l:"9",v:"9"}, {l:"/",v:"/",cls:""}, {l:"C",v:"CLEAR",cls:"danger"},
+  {l:"4",v:"4"}, {l:"5",v:"5"}, {l:"6",v:"6"}, {l:"×",v:"*"},{l:"(",v:"("},
+  {l:"1",v:"1"}, {l:"2",v:"2"}, {l:"3",v:"3"}, {l:"−",v:"-"},{l:")",v:")"},
+  {l:"0",v:"0"}, {l:".",v:"."}, {l:"^",v:"^"}, {l:"+",v:"+"},{l:"=",v:"EVAL",cls:"accent"},
+  {l:"←",v:"BACK",cls:""},{l:"( )",v:"PAREN"},{l:"%",v:"%"},{l:"±",v:"NEG"},{l:"ANS",v:"ANS"}
+];
+
+const SCI_KEYS = [
+  {l:"sin",v:"sin("},{l:"cos",v:"cos("},{l:"tan",v:"tan("},{l:"asin",v:"asin("},{l:"C",v:"CLEAR",cls:"danger"},
+  {l:"√x",v:"sqrt("},{l:"|x|",v:"abs("},{l:"eˣ",v:"exp("},{l:"ln",v:"log("},{l:"log₁₀",v:"log10("},
+  {l:"x²",v:"^2"},{l:"x³",v:"^3"},{l:"xⁿ",v:"^"},{l:"1/x",v:"^(-1)"},{l:")",v:")"},
+  {l:"π",v:"pi"},{l:"e",v:"e"},{l:"(",v:"("},{l:"←",v:"BACK"},{l:"=",v:"EVAL",cls:"accent"},
+  {l:"sinh",v:"sinh("},{l:"cosh",v:"cosh("},{l:"tanh",v:"tanh("},{l:"cbrt",v:"cbrt("},{l:"ANS",v:"ANS"}
+];
+
+const CONST_KEYS = [
+  {l:"π",v:"pi",cls:"",desc:"Pi ≈ 3.14159"},
+  {l:"e",v:"e",cls:"",desc:"Euler ≈ 2.71828"},
+  {l:"τ",v:"tau",cls:"",desc:"Tau = 2π"},
+  {l:"φ",v:"phi",cls:"",desc:"Golden ratio"},
+  {l:"√2",v:"sqrt(2)",cls:""},
+  {l:"√3",v:"sqrt(3)",cls:""},
+  {l:"ln2",v:"log(2)",cls:""},
+  {l:"1/e",v:"1/e",cls:""},
+  {l:"= eval",v:"EVAL",cls:"accent wide"},
+  {l:"Clear",v:"CLEAR",cls:"danger"},
+  {l:"←",v:"BACK"},
+  {l:"ANS",v:"ANS"}
+];
+
+let lastAnswer = 0;
+
+function buildCalcPad(containerId, keys) {
+  const pad = document.getElementById(containerId);
+  pad.innerHTML = "";
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "kbtn " + (k.cls || "");
+    btn.textContent = k.l;
+    if (k.desc) btn.title = k.desc;
+    btn.onclick = () => handleCalcKey(k.v);
+    pad.appendChild(btn);
+  });
+}
+
+function buildMemRow() {
+  const row = document.getElementById("mem-row");
+  row.innerHTML = "";
+  const ops = [
+    { l:"MC", fn: () => { mathEngine.memClear(); updateMemUI(); }},
+    { l:"MR", fn: () => {
+      calcExpr += mathEngine.memRecall().toString();
+      updateCalcDisplay();
+    }},
+    { l:"M+", fn: () => {
+      const v = mathEngine.evaluate(calcExpr);
+      if (v !== null) { mathEngine.memAdd(v); updateMemUI(); }
+    }},
+    { l:"MS", fn: () => {
+      const v = mathEngine.evaluate(calcExpr);
+      if (v !== null) { mathEngine.memStore(v); updateMemUI(); }
+    }}
+  ];
+  ops.forEach(op => {
+    const btn = document.createElement("button");
+    btn.className = "mem-btn" + (mathEngine.hasMemory ? " has-mem" : "");
+    btn.textContent = op.l;
+    btn.onclick = op.fn;
+    row.appendChild(btn);
+  });
+}
+
+function updateMemUI() {
+  document.querySelectorAll(".mem-btn").forEach(b => {
+    b.classList.toggle("has-mem", mathEngine.hasMemory);
+  });
+}
+
+function handleCalcKey(v) {
+  switch(v) {
+    case "CLEAR": calcExpr = ""; updateCalcDisplay("0"); break;
+    case "BACK":  calcExpr = calcExpr.slice(0, -1); updateCalcDisplay(); break;
+    case "NEG":
+      if (calcExpr) calcExpr = calcExpr.startsWith("-") ? calcExpr.slice(1) : "-" + calcExpr;
+      updateCalcDisplay();
+      break;
+    case "PAREN": {
+      const opens  = (calcExpr.match(/\(/g) || []).length;
+      const closes = (calcExpr.match(/\)/g) || []).length;
+      calcExpr += opens > closes ? ")" : "(";
+      updateCalcDisplay();
+      break;
+    }
+    case "ANS":
+      calcExpr += lastAnswer.toString();
+      updateCalcDisplay();
+      break;
+    case "EVAL": {
+      const result = mathEngine.evaluate(calcExpr);
+      const display = document.getElementById("calc-result-display");
+      if (result === null) {
+        display.textContent = "Error";
+        display.classList.add("error-state");
+      } else {
+        lastAnswer = result;
+        const fmt = mathEngine.format(result, 12);
+        display.textContent = fmt;
+        display.classList.remove("error-state");
+        appendHistory(calcExpr, fmt);
+      }
+      document.getElementById("calc-expr-display").textContent = toDisplay(calcExpr);
+      break;
+    }
+    default:
+      calcExpr += v;
+      updateCalcDisplay();
+  }
+}
+
+function updateCalcDisplay(forceResult) {
+  document.getElementById("calc-expr-display").textContent = toDisplay(calcExpr);
+  const display = document.getElementById("calc-result-display");
+  display.classList.remove("error-state");
+  if (forceResult !== undefined) {
+    display.textContent = forceResult;
+    return;
+  }
+  // Live eval
+  if (calcExpr) {
+    const v = mathEngine.evaluate(calcExpr);
+    if (v !== null) {
+      display.textContent = mathEngine.format(v, 10);
+    } else {
+      display.textContent = toDisplay(calcExpr) || "0";
+    }
+  } else {
+    display.textContent = "0";
+  }
+}
+
+// Tab switching
+document.querySelectorAll(".calc-tab").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".calc-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTab = btn.dataset.tab;
+    document.getElementById("calc-pad-basic").style.display  = activeTab === "basic"  ? "grid" : "none";
+    document.getElementById("calc-pad-sci").style.display    = activeTab === "sci"    ? "grid" : "none";
+    document.getElementById("calc-pad-const").style.display  = activeTab === "const"  ? "grid" : "none";
+  };
+});
+
+// Ang_mode toggle
+document.querySelectorAll(".angle-pill").forEach(p => {
+  p.onclick = () => {
+    document.querySelectorAll(".angle-pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    mathEngine.angleMode = p.dataset.mode;
+    renderer.draw(expressions);
+  };
+});
+
+// Keyboard input
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  const key = e.key;
+  if ("0123456789.+-*/^()".includes(key)) {
+    calcExpr += key;
+    updateCalcDisplay();
+  } else if (key === "Enter") {
+    handleCalcKey("EVAL");
+  } else if (key === "Backspace") {
+    calcExpr = calcExpr.slice(0, -1);
+    updateCalcDisplay();
+  } else if (key === "Escape") {
+    calcExpr = "";
+    updateCalcDisplay("0");
+  }
+});
+
+function appendHistory(expr, result) {
+  if (!expr) return;
+  sessionHistory.unshift({ expr, result });
+  if (sessionHistory.length > 80) sessionHistory.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById("hist-list");
+  if (sessionHistory.length === 0) {
+    list.innerHTML = `<div class="hist-empty">No calculations yet</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  sessionHistory.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "hist-entry";
+    div.title = "Click to restore";
+    div.onclick = () => {
+      calcExpr = item.expr;
+      document.getElementById("calc-result-display").textContent = item.result;
+      document.getElementById("calc-result-display").classList.remove("error-state");
+      document.getElementById("calc-expr-display").textContent = toDisplay(calcExpr);
+    };
+    div.innerHTML = `<span class="hist-expr">${toDisplay(item.expr)}</span><span class="hist-result">= ${item.result}</span>`;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById("clear-hist-btn").onclick = () => {
+  sessionHistory = [];
+  renderHistory();
+};
+
+document.getElementById("stats-calc-btn").onclick = () => {
+  const raw = document.getElementById("stats-input").value;
+  const nums = Stats.parse(raw);
+  const grid = document.getElementById("stats-grid");
+
+  if (nums.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;font-family:var(--font-mono);font-size:.78rem;color:var(--danger);">No valid numbers found</div>`;
+    return;
+  }
+
+  const items = [
+    { name:"Count",       val: nums.length                             },
+    { name:"Sum",         val: prettyNum(Stats.sum(nums))              },
+    { name:"Mean",        val: prettyNum(Stats.mean(nums))             },
+    { name:"Median",      val: prettyNum(Stats.median(nums))           },
+    { name:"Mode",        val: Stats.mode(nums)                        },
+    { name:"Std Dev",     val: prettyNum(Stats.stddev(nums))           },
+    { name:"Variance",    val: prettyNum(Stats.variance(nums))         },
+    { name:"Range",       val: prettyNum(Stats.range(nums))            },
+    { name:"Min",         val: prettyNum(Math.min(...nums))            },
+    { name:"Max",         val: prettyNum(Math.max(...nums))            }
+  ];
+
+  grid.innerHTML = items.map(i => `
+    <div class="stat-box">
+      <div class="stat-name">${i.name}</div>
+      <div class="stat-val">${i.val}</div>
+    </div>`).join("");
+};
+
+function buildBibliography() {
+  const list = document.getElementById("bib-list");
+  list.innerHTML = BIBLIOGRAPHY.map(b => `
+    <div class="bib-item">
+      <a class="bib-link" href="${b.url}" target="_blank" rel="noopener">${b.title}</a>
+      <div class="bib-desc">${b.desc}</div>
+    </div>`).join("");
+}
+
+document.getElementById("table-btn").onclick = () => {
+  document.getElementById("table-modal").classList.add("open");
+};
+document.getElementById("close-modal").onclick = () => {
+  document.getElementById("table-modal").classList.remove("open");
+};
+document.getElementById("table-modal").addEventListener("click", e => {
+  if (e.target === document.getElementById("table-modal"))
+    document.getElementById("table-modal").classList.remove("open");
+});
+
+document.getElementById("gen-table-btn").onclick = () => {
+  const from  = parseFloat(document.getElementById("tbl-from").value);
+  const to    = parseFloat(document.getElementById("tbl-to").value);
+  const step  = parseFloat(document.getElementById("tbl-step").value);
+  const wrap  = document.getElementById("table-wrap");
+
+  const validExprs = expressions.filter(e => e.fn);
+  if (validExprs.length === 0 || isNaN(from) || isNaN(to) || isNaN(step) || step <= 0) {
+    wrap.innerHTML = `<div style="padding:1rem;font-family:var(--font-mono);font-size:.8rem;color:var(--danger);">Add at least one valid function and set a valid range.</div>`;
+    return;
+  }
+
+  const rows = [];
+  for (let x = from; x <= to + 1e-10; x += step) {
+    rows.push(parseFloat(x.toPrecision(12)));
+  }
+
+  const headers = ["x", ...validExprs.map((e,i) => `f${i+1}`)].map(h => `<th>${h}</th>`).join("");
+  const body = rows.map(x => {
+    const cells = validExprs.map(e => {
+      const v = e.fn(x);
+      return `<td style="color:${e.color}">${isNaN(v) ? "undef" : prettyNum(v,6)}</td>`;
+    });
+    return `<tr><td>${prettyNum(x,6)}</td>${cells.join("")}</tr>`;
+  }).join("");
+
+  wrap.innerHTML = `<table><thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table>`;
+};
+
+buildThemeStrip();
+buildPresets();
+buildBibliography();
+buildCalcPad("calc-pad-basic", BASIC_KEYS);
+buildCalcPad("calc-pad-sci",   SCI_KEYS);
+buildCalcPad("calc-pad-const", CONST_KEYS);
+buildMemRow();
+renderExpressionList();
+renderHistory();
+
+setTimeout(() => {
+  initCanvas();
+}, 0);
+
+addExpression("f(x) = sin(x)");
+</script>
+</body>
+</html>
