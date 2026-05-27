@@ -1706,9 +1706,12 @@ class GraphRenderer {
     this.ctx = canvas.getContext("2d");
     this.engine = engine;
     this.dpr = window.devicePixelRatio || 1;
-    this.scale = 50;        // px / unit
-    this.offsetX = 0;       // canvas-px offset of x=0
-    this.offsetY = 0;       // canvas-px offset of y=0
+    this.scale = 50; 
+    
+    const rect = canvas.getBoundingClientRect();
+    this.offsetX = (rect.width || 600) / 2; 
+    this.offsetY = (rect.height || 500) / 2; 
+    
     this.isPanning = false;
     this.panStartX = 0;
     this.panStartY = 0;
@@ -1719,16 +1722,11 @@ class GraphRenderer {
     this._hoveredPoint = null;
   }
 
-  resize(holderEl) {
-    const dpr = this.dpr;
-    const w = holderEl.clientWidth;
-    const h = holderEl.clientHeight;
+  resize(w, h) {
     this.logicalW = w;
     this.logicalH = h;
-    this.canvas.width  = Math.round(w * dpr);
-    this.canvas.height = Math.round(h * dpr);
-    this.canvas.style.width  = w + "px";
-    this.canvas.style.height = h + "px";
+    this.canvas.width = w * this.dpr;
+    this.canvas.height = h * this.dpr;
     if (this.offsetX === 0 && this.offsetY === 0) {
       this.offsetX = w / 2;
       this.offsetY = h / 2;
@@ -1736,127 +1734,115 @@ class GraphRenderer {
   }
 
   resetView() {
-    this.offsetX = this.logicalW / 2;
-    this.offsetY = this.logicalH / 2;
-    this.scale   = 50;
+    this.scale = 50;
+    const rect = this.canvas.getBoundingClientRect();
+    this.offsetX = (rect.width || this.logicalW || this.canvas.width / this.dpr) / 2;
+    this.offsetY = (rect.height || this.logicalH || this.canvas.height / this.dpr) / 2;
+    document.getElementById("scale-display").textContent = `Scale: ${this.scale}px/unit`;
   }
 
-  /* Range */
-  applyRange(xMin, xMax, yMin, yMax) {
-    const w = this.logicalW, h = this.logicalH;
-    const scaleX = w / (xMax - xMin);
-    const scaleY = h / (yMax - yMin);
-    this.scale   = Math.min(scaleX, scaleY);
-    this.offsetX = -xMin * this.scale;
-    this.offsetY =  yMax * this.scale;
+  zoom(factor, centerX, centerY) {
+    if (centerX === undefined) centerX = (this.logicalW || this.canvas.width / this.dpr) / 2;
+    if (centerY === undefined) centerY = (this.logicalH || this.canvas.height / this.dpr) / 2;
+    const mx = (centerX - this.offsetX) / this.scale;
+    const my = (this.offsetY - centerY) / this.scale;
+    this.scale = Math.max(5, Math.min(2000, this.scale * factor));
+    this.offsetX = centerX - mx * this.scale;
+    this.offsetY = centerY + my * this.scale;
   }
 
-  zoom(factor, cx, cy) {
-    if (cx === undefined) { cx = this.logicalW / 2; cy = this.logicalH / 2; }
-    const mx = (cx - this.offsetX) / this.scale;
-    const my = (this.offsetY - cy) / this.scale;
-    this.scale   = Math.min(Math.max(this.scale * factor, 6), 800);
-    this.offsetX = cx - mx * this.scale;
-    this.offsetY = cy + my * this.scale;
-  }
-
-  /* Draw */
   draw(expressions) {
     const { ctx, dpr } = this;
-    const lW = this.logicalW, lH = this.logicalH;
+    const lW = this.logicalW || this.canvas.width / dpr, lH = this.logicalH || this.canvas.height / dpr;
     const sc = this.scale, ox = this.offsetX, oy = this.offsetY;
-
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Clear
     const theme = document.body.getAttribute("data-theme") || "brown";
     const isA11y = document.body.classList.contains("a11y-on");
     ctx.fillStyle = isA11y ? "#000" : this._canvasBg(theme);
     ctx.fillRect(0, 0, lW, lH);
-
-    // Grid
     this._drawGrid(isA11y, theme, lW, lH, sc, ox, oy);
-
-    // Axes
     this._drawAxes(isA11y, theme, lW, lH, sc, ox, oy);
-
-    // Snap
     this._computeHoverSnap(expressions, lW, lH, sc, ox, oy);
-
-    // Functions + dots
-    expressions.forEach(item => {
-      if (item.fn) this._drawFunction(item, isA11y, lW, lH, sc, ox, oy);
-    });
-
-    // Crosshair
-    if (this._mouseX !== null) {
-      this._drawCrosshair(isA11y, lW, lH);
-    }
-
-    // Hover priority
-    if (this._hoveredPoint) {
-      this._drawHoverTooltip(isA11y, lW, lH);
-    }
-
+    expressions.forEach(item => { if (item.fn) this._drawFunction(item, isA11y, lW, lH, sc, ox, oy); });
+    if (this._mouseX !== null) { this._drawCrosshair(isA11y, lW, lH); }
+    if (this._hoveredPoint) { this._drawHoverTooltip(isA11y, lW, lH); }
     ctx.restore();
   }
 
   _canvasBg(theme) {
-    const map = {
-      brown: "#0d0c0c", obsidian: "#050505", matte: "#111",
-      ivory: "#ede6d8", ocean: "#010810", marine: "#020e0e"
-    };
-    return map[theme] || "#0d0c0c";
+    if (theme === "void") return "#050505";
+    if (theme === "matte") return "#111";
+    if (theme === "light-brown") return "#ede6d8";
+    if (theme === "ocean") return "#010810";
+    if (theme === "marine") return "#020e0e";
+    return "#0d0c0c";
   }
 
   _drawGrid(isA11y, theme, W, H, sc, ox, oy) {
     const ctx = this.ctx;
-    const gridAlpha = isA11y ? 0.15 : 0.04;
-    const axisAlpha = isA11y ? 1    : 0.3;
-
-    ctx.strokeStyle = isA11y ? `rgba(255,255,255,${gridAlpha})` : this._gridColor(theme, gridAlpha);
+    ctx.strokeStyle = isA11y ? "rgba(255,255,255,0.15)" : "rgba(242,236,230,0.04)";
     ctx.lineWidth = 1;
-
-    let step = sc;
-    if (sc < 20) step = sc * Math.ceil(40 / sc);
-    if (sc > 200) step = sc / Math.floor(sc / 100);
-
-    // Vertical gl
-    const x0 = (((-ox) % step) + step) % step;
-    for (let x = x0; x <= W; x += step) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    let step = 50;
+    if (sc < 20) step = 100;
+    if (sc > 150) step = 10;
+    const xi0 = (((-ox) % step) + step) % step;
+    for (let x = xi0; x <= W; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
     }
-
-    // Horizontal gl
-    const y0 = (((-oy) % step) + step) % step;
-    for (let y = y0; y <= H; y += step) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    const yi0 = (((-oy) % step) + step) % step;
+    for (let y = yi0; y <= H; y += step) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
     }
   }
 
   _drawAxes(isA11y, theme, W, H, sc, ox, oy) {
     const ctx = this.ctx;
-    const axisColor = isA11y ? "#ffff00" : this._axisColor(theme);
-
+    const axisColor = isA11y ? "#ffff00" : "rgba(242,236,230,0.3)";
     ctx.strokeStyle = axisColor;
-    ctx.lineWidth = isA11y ? 2.5 : 1.5;
-
-    // X axis
-    ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke();
-    // Y axis
-    ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, H); ctx.stroke();
-
-    // Tick
-    ctx.fillStyle = isA11y ? "#ffffff" : this._labelColor(theme);
-    ctx.font = isA11y ? "bold 12px monospace" : "10px 'JetBrains Mono', monospace";
-
-    let step = sc;
-    if (sc < 20) step = sc * Math.ceil(40 / sc);
-    if (sc > 200) step = sc / Math.floor(sc / 100);
-
-    const unitStep = step / sc;
+    ctx.lineWidth = 2;
+    if (oy >= 0 && oy <= H) {
+      ctx.beginPath();
+      ctx.moveTo(0, oy);
+      ctx.lineTo(W, oy);
+      ctx.stroke();
+    }
+    if (ox >= 0 && ox <= W) {
+      ctx.beginPath();
+      ctx.moveTo(ox, 0);
+      ctx.lineTo(ox, H);
+      ctx.stroke();
+    }
+    ctx.fillStyle = axisColor;
+    ctx.font = "10px monospace";
+    let step = 50;
+    if (sc < 20) step = 100;
+    if (sc > 150) step = 10;
+    const xi0 = (((-ox) % step) + step) % step;
+    for (let px = xi0; px <= W; px += step) {
+      const val = (px - ox) / sc;
+      if (Math.abs(val) < 1e-9) continue;
+      ctx.fillText(val.toFixed(1).replace(".0",""), px - 5, Math.min(Math.max(oy + 12, 12), H - 5));
+    }
+    const yi0 = (((-oy) % step) + step) % step;
+    for (let py = yi0; py <= H; py += step) {
+      const val = (oy - py) / sc;
+      if (Math.abs(val) < 1e-9) continue;
+      ctx.fillText(val.toFixed(1).replace(".0",""), Math.min(Math.max(ox + 5, 5), W - 25), py + 4);
+    }
   }
+
+  _computeHoverSnap() {}
+  _drawFunction() {}
+  _drawCrosshair() {}
+  _drawHoverTooltip() {}
+}
 
     // X labels
     const xi0 = (((-ox) % step) + step) % step;
